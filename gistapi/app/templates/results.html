@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+    <body>
+        <h1>Search results for user '{{ transfered_data[0]}}' gists with pattern '{{ transfered_data[1]}}'!</h1>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        {% if pagination %}
+        <ul>
+            {% for link in pagination.items %}
+            <li><a href="{{ link.link }}">{{ link.link }}</a><div>{{ link.pattern }}</div></li>
+            {% endfor %}
+            {% if prev_url %}
+            <a href="{{ prev_url }}">Newer gists</a>
+            {% endif %}
+            {% if next_url %}
+            <a href="{{ next_url }}">Older gists</a>
+            {% endif %}
+        </ul>
+        {% endif %}
+        <a href="{{ url_for('search') }}">Search again!</a>
+    </body>
+</html>

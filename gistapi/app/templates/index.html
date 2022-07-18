@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{{ title }} - Gistapi</title>
+    </head>
+    <body>
+        <h1>Search gists of a user that match a pattern!</h1>
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.username.label }}<br>
+                {{ form.username(size=32) }}<br>
+                {% for error in form.username.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.pattern.label }}<br>
+                {{ form.pattern(size=32) }}<br>
+                {% for error in form.pattern.errors %}
+                <span style="color: blueviolet;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+        <hr>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        <form method="post">
+            <p>Celery example: <input type="text" name="test" value="{{ testing }}"></p>
+            <input type="submit" name="submit" value="Send">
+            <input type="submit" name="submit" value="Send in 1 minute">
+        </form>
+        <!--<script src="//cdnjs.cloudflare.com/ajax/libs/nanobar/0.2.1/nanobar.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script>
+            function start_long_task() {
+                div = $('<div class="progress"><div></div><div>0%</div><div>...</div><div>&nsbp;</div></div><hr>');
+                $('#progress').append(div);
+
+                var nanobar = new Nanobar({
+                    bg: '#44f',
+                    target: div[0].childNodes[00]
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/longtask',
+                    success: function(data, status, request){
+                        status_url = request.getResponseHeader('Location');
+                        update_progress(status_url, nanobar, div[0]);
+                    },
+                    error: function() {
+                        alert('Unexpected error');
+                    }
+                });
+            }
+            function update_progress(status_url, nanobar, status_div) {
+                $.getJSON(status_url, function(data) {
+                    percent = parseInt(data['current'] * 100 / data['total']);
+                    nanobar.go(percent);
+                    $(status_div.childNodes[1]).text(percent + '%');
+                    $(status_div.childNodes[2]).text(data['status']);
+                    if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+                        if ('result' in data) {
+                            $(status_div.childNodes[3]).text('Result: ' +data['result']);
+                        }
+                        else {
+                            $(status_div.childNodes[3]).text('Result: ' +data['state']);
+                        }
+                    }
+                    else {
+                        setTimeout(function() {
+                            update_progress(status_url, nanobar, status_div);
+                       }, 2000);
+                    }
+                });
+            }
+        </script>
+        -->
+        {% block scripts %}
+        <script>
+            setInterval(
+                function()
+                {
+                    $.getJSON(
+                        $SCRIPT_ROOT + '/api/v1/search', {},
+                        function(data)
+                        {
+                            $("result").text(data.result);
+                        });
+                },
+            500);
+        </script>
+        {% endblock %}
+    </body>
+</html>
