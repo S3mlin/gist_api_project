@@ -1,10 +1,8 @@
 from flask import Flask
-from config import Config
-from flask_sqlalchemy import SQLAlchemy
+from app.config import Config
 from flask_migrate import Migrate
-from celery import Celery
 import time, subprocess, threading
-
+import os
 
 def cache_clear(f_stop):
     print('clearing cache...')
@@ -12,13 +10,25 @@ def cache_clear(f_stop):
     if not f_stop.is_set():
         threading.Timer(60, cache_clear, [f_stop]).start()
 
-event_handler = threading.Event()
-cache_clear(event_handler)
+if os.environ.get("activate_cache", False):
+    event_handler = threading.Event()
+    cache_clear(event_handler)
 
 
-app = Flask(__name__)
-app.config.from_object(Config)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+def create_app(config_class='Config'):
+    app = Flask(__name__)
+    app.config.from_object(f"app.config.{config_class}")
+    
+    from app.extensions import db, celery
+    db.init_app(app)
+    migrate = Migrate(app, db)
 
-from app import routes, models
+    from app import models
+    from app.routes import bp
+
+    app.register_blueprint(bp)
+
+
+    celery.config_from_object(f"app.config.{config_class}")
+
+    return app

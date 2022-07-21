@@ -4,6 +4,7 @@ from wtforms.validators import DataRequired
 
 
 class SearchForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    pattern = StringField('Pattern', validators=[DataRequired()])
+    username = StringField('Username')
+    pattern = StringField('Pattern')
     submit = SubmitField('Search')
+#validators=[DataRequired()]

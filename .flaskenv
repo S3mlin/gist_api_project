@@ -1,1 +1,2 @@
-FLASK_APP=gistapi.py
+FLASK_APP="app:create_app"
+activate_cache=True
