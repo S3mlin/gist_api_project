@@ -59,9 +59,11 @@
                         status_url = request.getResponseHeader('Location');
                         update_progress(status_url, div[0]);
                     },
-                    error: function() {
-                        alert('XD');
-                    }
+                    error: function(request, error) {
+                        console.log(arguments);
+                        alert("Can't do because:" + error);
+                    },
+                    data: {'parameter': 'hardcoded_parameter'}
                 });
             }
             function update_progress(status_url, status_div){

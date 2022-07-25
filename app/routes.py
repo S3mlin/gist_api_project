@@ -15,6 +15,7 @@ bp = Blueprint("bp", __name__)
 @celery.task(bind=True)
 def button_test(self, test):
     self.update_state(state='PENDING')
+    print(test)
     time.sleep(5)
     self.update_state(state='COMPLETE')
     return test
@@ -36,6 +37,8 @@ def gists_for_user():
 @bp.route('/api/v1/search', methods=['GET', 'POST'])
 def search():
     form = SearchForm()
+    if request.method == 'GET':
+        return render_template('index.html', title='Home',form=form)
     approved = []
     if form.validate_on_submit():
         form_data = [form.username.data, form.pattern.data]
@@ -113,7 +116,10 @@ def results():
 
 @bp.route('/longtask', methods=['POST'])
 def longtask():
-    task = button_test.apply_async()
+    received_data = request.values
+    variable = received_data.get('parameter')
+    print(variable)
+    task = button_test.apply_async(args=[variable])
     return jsonify({'Location': url_for('bp.taskstatus', task_id=task.id)}), 202
 
 @bp.route('/status/<task_id>')
