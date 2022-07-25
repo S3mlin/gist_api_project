@@ -40,13 +40,48 @@
         {% endif %}
         {% endwith %}
         <form method="post">
-            <p>Celery example: <input type="text" name="test" value="{{ testing }}"></p>
-            <input type="submit" name="submit" value="Send">
-            <input type="submit" name="submit" value="Send in 1 minute">
+            <p>Celery example: <input type="text" name="test" value="{{ test }}"></p>
+            <input id="hm" type="submit" name="submit" value="Send">
+            <input id="hm" type="submit" name="submit" value="Send in 1 minute">
         </form>
+        <button id="start-bg-job">Start long calculation</button><br><br>
+        <div id="progress"></div>
         <script src="//cdnjs.cloudflare.com/ajax/libs/nanobar/0.2.1/nanobar.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
         <script>
+            function return_input() {
+                div = $('<div class="progress"><div>?</div></div>');
+                $('#progress').append(div);
+                $.ajax({
+                    type: 'POST',
+                    url: '/longtask',
+                    success: function(data, status, request){
+                        status_url = request.getResponseHeader('Location');
+                        update_progress(status_url, div[0]);
+                    },
+                    error: function() {
+                        alert('XD');
+                    }
+                });
+            }
+            function update_progress(status_url, status_div){
+                $.getJSON(status_url, function(data) {
+                    if (data['state'] ==  'PENDING'){
+                        $(status_div.childNodes[0]).text('tasking...');
+                    }
+                    else if (data['state'] == 'COMPLETE'){
+                        $(status_div.childNodes[0]).text('working');
+                    }
+                });
+                setTimeout(function() {
+                            update_progress(status_url, status_div);
+                       }, 500);
+            }
+            $(function() {
+                $('#hm').click(return_input);
+            });
+        </script>
+        <!--<script>
             function start_long_task() {
                 div = $('<div class="progress"><div></div><div>0%</div><div>...</div><div>&nbsp;</div></div><hr>');
                 $('#progress').append(div);
@@ -92,6 +127,6 @@
             $(function() {
                 $('#start-bg-job').click(start_long_task);
             });
-        </script>
+        </script> -->
     </body>
 </html>
