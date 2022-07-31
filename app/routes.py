@@ -12,14 +12,13 @@ import datetime
 bp = Blueprint("bp", __name__)
 
 
-@celery.task(bind=True)
-def button_test(self, test):
-    self.update_state(state='PENDING')
-    print(test)
-    time.sleep(5)
-    self.update_state(state='COMPLETE')
-    return test
-
+# @celery.task(bind=True)
+# def button_test(self, test):
+#     self.update_state(state='PENDING')
+#     print(test)
+#     time.sleep(5)
+#     self.update_state(state='COMPLETE')
+#     return test 
 
 @bp.route('/ping')
 def ping():
@@ -114,18 +113,18 @@ def results():
                             transfered_data=transfered_data)
 
 
-@bp.route('/longtask', methods=['POST'])
-def longtask():
-    received_data = request.values
-    variable = received_data.get('parameter')
-    print(variable)
-    task = button_test.apply_async(args=[variable])
-    return jsonify({'Location': url_for('bp.taskstatus', task_id=task.id)}), 202
+# @bp.route('/longtask', methods=['POST'])
+# def longtask():
+#     received_data = request.values
+#     variable = received_data.get('parameter')
+#     print(variable)
+#     task = button_test.apply_async(args=[variable])
+#     return jsonify({'Location': url_for('bp.taskstatus', task_id=task.id), 'task_id': task.id}), 202
 
-@bp.route('/status/<task_id>')
-def taskstatus(task_id):
-    task = button_test.AsyncResult(task_id)
-    response = {
-        'state': task.state
-    }
-    return jsonify(response)
+# @bp.route('/status/<task_id>')
+# def taskstatus(task_id):
+#     task = button_test.AsyncResult(task_id)
+#     response = {
+#         'state': task.state
+#     }
+#     return jsonify(response)
